@@ -13,20 +13,27 @@ export class HandleController {
     try {
       switch (method.toLowerCase()) {
         case 'get': {
-          const cache = this.createCacheUseCase.getCache({ prefix, key })
-          console.log('Cache retornado: ', cache)
-          return response.status(200).json(cache)
+          const cacheReturned = this.createCacheUseCase.getCache({ prefix, key })
+          cacheReturned.then(cache => {
+            return response.status(200).json(cache)
+          })
+          break
         }
         case 'set':
-          await this.createCacheUseCase.setCache({ method, prefix, key, value, pattern })
+          await this.createCacheUseCase.setCache({ prefix, key, value })
           return response.status(201).send()
         case 'del':
           await this.createCacheUseCase.delCache({ prefix, key })
           return response.status(200).send()
         case 'keys': {
-          const caches = this.createCacheUseCase.getKeysCache(pattern)
-          return response.status(200).json(caches)
+          const keysReturneds = this.createCacheUseCase.getKeysCache(pattern)
+          keysReturneds.then(keys => {
+            return response.status(200).json(keys)
+          })
+          break
         }
+        default:
+          return response.status(400).json({ message: 'Choose one of the following commands: SET, GET, DEL, KEYS' })
       }
     } catch (err) {
       return response.status(400).json({

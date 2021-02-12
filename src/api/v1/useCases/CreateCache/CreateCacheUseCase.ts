@@ -8,40 +8,33 @@ export class CreateCacheUseCase {
     private cacheRepository: ICacheRepository
   ) {}
 
-  // async execute (data: ICreateCacheRequestDTO) {
-  //   const cache = new Cache(data.prefix, data.key, data.value)
-  //   console.log('Objeto criado: ', cache)
-
-  //   await this.cacheRepository.set(cache)
-  // }
-
   async setCache (data: ICreateCacheRequestDTO): Promise<void> {
-    const cache = new Cache(data.prefix, data.key, data.value)
+    const cache = Cache.create(data)
 
     await this.cacheRepository.set(cache)
   }
 
   async getCache (data: ICreateCacheRequestDTO): Promise<Cache> {
-    const cache = new Cache(data.prefix, data.key, data.value)
+    const cache = Cache.create(data)
 
-    const cacheReturned = this.cacheRepository.get(cache.id)
-
-    console.log('Cache Retornado Use Case: ', cacheReturned)
-
-    return cacheReturned
+    return new Promise((resolve) => {
+      this.cacheRepository.get(cache.key).then(result => {
+        resolve(result)
+      })
+    })
   }
 
   async delCache (data: ICreateCacheRequestDTO): Promise<void> {
-    const cache = new Cache(data.prefix, data.key, data.value)
+    const cache = Cache.create(data)
 
-    await this.cacheRepository.del(cache.id)
+    await this.cacheRepository.del(cache.key)
   }
 
-  async getKeysCache (data: ICreateCacheRequestDTO): Promise<Cache[]> {
-    const cache = new Cache(data.prefix, data.key, data.value)
-
-    const caches = this.cacheRepository.keys(cache.pattern)
-
-    return caches
+  async getKeysCache (pattern: string): Promise<Cache[]> {
+    return new Promise((resolve) => {
+      this.cacheRepository.keys(pattern).then(result => {
+        resolve(result)
+      })
+    })
   }
 }
